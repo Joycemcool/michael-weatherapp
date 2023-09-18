@@ -2,13 +2,16 @@ package com.example.weatherapp700;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.weatherapp700.databinding.ActivityMainBinding;
 import com.example.weatherapp700.models.Weather;
 import com.google.gson.Gson;
 
@@ -19,10 +22,16 @@ import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
+    ActivityMainBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+        //setContentView(R.layout.activity_main);
 
         String json = getJsonFromFile();
 
@@ -39,10 +48,10 @@ public class MainActivity extends AppCompatActivity {
         TextView textViewDescription = findViewById(R.id.textViewDescription);
         textViewDescription.setText(weather.getCurrent().getCondition().getText());
 
-        // Display the weather icon
+        // Display the weather icon (remember to add Internet permissions in manifest)
         ImageView imageView = findViewById(R.id.imageViewIcon);
-        String imageUrl = "https://" + weather.getCurrent().getCondition().getIcon();
-        //Glide.with(view).load(imageUrl).into(imageView);
+        String imageUrl = "https:" + weather.getCurrent().getCondition().getIcon();
+        Glide.with(view).load(imageUrl).into(imageView);
     }
 
     // Get JSON string from .json file
