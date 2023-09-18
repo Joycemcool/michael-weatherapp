@@ -42,12 +42,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_action_sun" />
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="409dp"
-        android:layout_height="wrap_content"
-        android:entries="@array/myEntries"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="116dp" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
