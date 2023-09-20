@@ -18,6 +18,10 @@ import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,18 +44,53 @@ public class MainActivity extends AppCompatActivity {
         Weather weather = gson.fromJson(json, Weather.class);
 
         // Display the temperature
-        TextView textViewTemperature = findViewById(R.id.textViewTemperature);
+        TextView textViewTemperature = binding.textViewTemperature;
         String temperature = String.valueOf(weather.getCurrent().getTemperature()) + "°C";
         textViewTemperature.setText(temperature);
 
         //Display the condition description
-        TextView textViewDescription = findViewById(R.id.textViewDescription);
+        TextView textViewDescription = binding.textViewDescription;
         textViewDescription.setText(weather.getCurrent().getCondition().getText());
 
         // Display the weather icon (remember to add Internet permissions in manifest)
-        ImageView imageView = findViewById(R.id.imageViewIcon);
+        ImageView imageView = binding.imageViewIcon;
         String imageUrl = "https:" + weather.getCurrent().getCondition().getIcon();
+        imageUrl = imageUrl.replace("64x64","128x128");
         Glide.with(view).load(imageUrl).into(imageView);
+
+        // Display the Location
+        String[] locationItems = getResources().getStringArray(R.array.canada);
+        HashMap<String, String> locationHash = new HashMap<String,String>();
+
+        String item1 = locationItems[""];
+
+        for(int i = 0; i < locationItems.length; i++ ){
+            //locationHash.put()
+        }
+
+        //List<String> listCodes = Arrays.asList(provinceCodes);
+        // int index = listCodes.indexOf(weather.getLocation().getRegion());
+        // String code = listCodes.get(index);
+        // weather.getLocation().getRegion()
+
+        TextView textViewLocation = binding.textViewLocation;
+        String fullLocation = weather.getLocation().getName() + ", " + weather.getLocation().getRegion();
+        textViewLocation.setText(fullLocation);
+
+        // Display the Feels Like
+        TextView textViewFeelsLike = binding.textViewFeelsLike;
+        String feelsLike = "Feel like " + String.valueOf(weather.getCurrent().getFeelsLike()) + "°C";
+        textViewFeelsLike.setText(feelsLike);
+    }
+
+    // Convert province string array into map<k,v>.
+    Map<String, String> getKeyValueFromStringArray(String[] array) {
+        Map<String, String> result = new HashMap<>();
+        for (String str : array) {
+            String[] splitItem = str.split("|");
+            result.put(splitItem[0], splitItem[1]);
+        }
+        return result;
     }
 
     // Get JSON string from .json file

@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">WeatherApp700</string>
+
+    <string-array name="canada">
+        <item name="Newfoundland and Labrador">NL</item>
+        <item name="Prince Edward Island">PE</item>
+        <item name="Nova Scotia">NS</item>
+        <item name="New Brunswick">NB</item>
+        <item name="Quebec">QC</item>
+        <item name="Ontario">ON</item>
+        <item name="Manitoba">MB</item>
+        <item name="Saskatchewan">SK</item>
+        <item name="Alberta">AB</item>
+        <item name="British Columbia">BC</item>
+        <item name="Yukon">YT</item>
+        <item name="Northwest Territories">NT</item>
+        <item name="Nunavut">NU</item>
+    </string-array>
 </resources>
