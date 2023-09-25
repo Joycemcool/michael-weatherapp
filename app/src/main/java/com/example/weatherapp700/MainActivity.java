@@ -59,22 +59,14 @@ public class MainActivity extends AppCompatActivity {
         Glide.with(view).load(imageUrl).into(imageView);
 
         // Display the Location
-        String[] locationItems = getResources().getStringArray(R.array.canada);
-        HashMap<String, String> locationHash = new HashMap<String,String>();
+        String[] locationArray = getResources().getStringArray(R.array.provinces);
+        HashMap<String, String> locationHash = getHashFromStringArray(locationArray);
 
-        String item1 = locationItems[""];
-
-        for(int i = 0; i < locationItems.length; i++ ){
-            //locationHash.put()
-        }
-
-        //List<String> listCodes = Arrays.asList(provinceCodes);
-        // int index = listCodes.indexOf(weather.getLocation().getRegion());
-        // String code = listCodes.get(index);
-        // weather.getLocation().getRegion()
+        String region = weather.getLocation().getRegion();
+        String abbrev = locationHash.get(region);
 
         TextView textViewLocation = binding.textViewLocation;
-        String fullLocation = weather.getLocation().getName() + ", " + weather.getLocation().getRegion();
+        String fullLocation = weather.getLocation().getName() + ", " + abbrev;
         textViewLocation.setText(fullLocation);
 
         // Display the Feels Like
@@ -84,11 +76,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Convert province string array into map<k,v>.
-    Map<String, String> getKeyValueFromStringArray(String[] array) {
-        Map<String, String> result = new HashMap<>();
+    HashMap<String, String> getHashFromStringArray(String[] array) {
+        HashMap<String, String> result = new HashMap<>();
         for (String str : array) {
-            String[] splitItem = str.split("|");
-            result.put(splitItem[0], splitItem[1]);
+            // e.g. ON, Ontario
+            String[] splitItem = str.split(",");
+            result.put(splitItem[1], splitItem[0]);
         }
         return result;
     }
