@@ -1,6 +1,8 @@
 package com.example.weatherapp700.models;
 
-public class Weather {
+import java.io.Serializable;
+
+public class Weather implements Serializable {
     private Location location;
     private Current current;
 

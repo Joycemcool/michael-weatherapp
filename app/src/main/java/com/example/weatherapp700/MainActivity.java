@@ -12,12 +12,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.weatherapp700.databinding.ActivityMainBinding;
+import com.example.weatherapp700.fragments.CurrentFragment;
 import com.example.weatherapp700.models.Weather;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
+
+    private CurrentFragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,48 +47,41 @@ public class MainActivity extends AppCompatActivity {
         Gson gson = new Gson();
         Weather weather = gson.fromJson(json, Weather.class);
 
-        // Display the temperature
-        TextView textViewTemperature = binding.textViewTemperature;
-        String temperature = String.valueOf(weather.getCurrent().getTemperature()) + "°C";
-        textViewTemperature.setText(temperature);
-
-        //Display the condition description
-        TextView textViewDescription = binding.textViewDescription;
-        textViewDescription.setText(weather.getCurrent().getCondition().getText());
-
-        // Display the weather icon (remember to add Internet permissions in manifest)
-        ImageView imageView = binding.imageViewIcon;
-        String imageUrl = "https:" + weather.getCurrent().getCondition().getIcon();
-        imageUrl = imageUrl.replace("64x64","128x128");
-        Glide.with(view).load(imageUrl).into(imageView);
-
         // Display the Location
         String[] locationArray = getResources().getStringArray(R.array.provinces);
         HashMap<String, String> locationHash = getHashFromStringArray(locationArray);
-
         String region = weather.getLocation().getRegion();
         String abbrev = locationHash.get(region);
 
-        TextView textViewLocation = binding.textViewLocation;
+        TextView textViewLocation = view.findViewById(R.id.textViewLocation);
         String fullLocation = weather.getLocation().getName() + ", " + abbrev;
         textViewLocation.setText(fullLocation);
 
-        // Display the Feels Like
-        TextView textViewFeelsLike = binding.textViewFeelsLike;
-        String feelsLike = "Feel like " + String.valueOf(weather.getCurrent().getFeelsLike()) + "°C";
-        textViewFeelsLike.setText(feelsLike);
+        // Setup Fragments
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("weather", weather);
+
+        currentFragment = new CurrentFragment();
+        currentFragment.setArguments(bundle);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayout, currentFragment)
+                .commit();
     }
 
     // Convert province string array into map<k,v>.
-    HashMap<String, String> getHashFromStringArray(String[] array) {
+    private HashMap<String, String> getHashFromStringArray(String[] array) {
         HashMap<String, String> result = new HashMap<>();
         for (String str : array) {
-            // e.g. ON, Ontario
+            // e.g. ON,Ontario
             String[] splitItem = str.split(",");
             result.put(splitItem[1], splitItem[0]);
         }
         return result;
     }
+
 
     // Get JSON string from .json file
     private String getJsonFromFile() {
