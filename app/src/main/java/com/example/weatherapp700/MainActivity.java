@@ -1,11 +1,13 @@
 package com.example.weatherapp700;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -13,7 +15,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.weatherapp700.databinding.ActivityMainBinding;
 import com.example.weatherapp700.fragments.CurrentFragment;
+import com.example.weatherapp700.fragments.ForecastFragment;
 import com.example.weatherapp700.models.Weather;
+import com.google.android.material.navigation.NavigationBarView;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -31,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
 
     private CurrentFragment currentFragment;
+    private ForecastFragment forecastFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +62,38 @@ public class MainActivity extends AppCompatActivity {
         String fullLocation = weather.getLocation().getName() + ", " + abbrev;
         textViewLocation.setText(fullLocation);
 
+        //
+        // Setup Bottom Navigation View
+        //
+        NavigationBarView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                if(itemId == R.id.navigation_current){
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.frameLayout, currentFragment)
+                            .commit();
+                    return true;
+                }
+
+                if(itemId == R.id.navigation_forecast){
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.frameLayout, forecastFragment)
+                            .commit();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        //
         // Setup Fragments
+        //
 
         Bundle bundle = new Bundle();
         bundle.putSerializable("weather", weather);
@@ -65,10 +101,9 @@ public class MainActivity extends AppCompatActivity {
         currentFragment = new CurrentFragment();
         currentFragment.setArguments(bundle);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.frameLayout, currentFragment)
-                .commit();
+        forecastFragment = new ForecastFragment();
+
+        bottomNavigationView.setSelectedItemId(R.id.navigation_current);
     }
 
     // Convert province string array into map<k,v>.
