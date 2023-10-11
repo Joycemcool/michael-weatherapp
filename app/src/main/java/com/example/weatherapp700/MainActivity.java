@@ -16,7 +16,9 @@ import com.bumptech.glide.Glide;
 import com.example.weatherapp700.databinding.ActivityMainBinding;
 import com.example.weatherapp700.fragments.CurrentFragment;
 import com.example.weatherapp700.fragments.ForecastFragment;
+import com.example.weatherapp700.models.Location;
 import com.example.weatherapp700.models.Weather;
+import com.example.weatherapp700.retrofit.RetrofitClient;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.gson.Gson;
 
@@ -30,9 +32,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
+
+    View view;
 
     private CurrentFragment currentFragment;
     private ForecastFragment forecastFragment;
@@ -42,30 +50,73 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        View view = binding.getRoot();
+        view = binding.getRoot();
         setContentView(view);
         //setContentView(R.layout.activity_main);
 
-        String json = getJsonFromFile();
+        NavigationBarView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
+        //
+        // Retrofit client to get weather
+        //
+        String currentLocation = "44.6671142,-63.6075769";
+
+        // Create and initialize the Api client
+        Call<Weather> call = RetrofitClient.getInstance().getApi().getWeather(
+                "62c7fc37d6b04ecaa6d225851231108",
+                currentLocation,
+                "3",
+                "no",
+                "no");
+
+        // Make the Api call
+        call.enqueue(new Callback<Weather>() {
+            @Override
+            public void onResponse(Call<Weather> call, Response<Weather> response) {
+                Weather weather = response.body();
+
+                //
+                // Setup Fragments
+                //
+
+                if(weather != null){
+
+                    // Update the location in Activity Layout
+                    DisplayLocation(weather.getLocation());
+
+                    // Add weather object to Bundle
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("weather", weather);
+
+                    // Create fragment and pass bundle as an argument
+                    currentFragment = new CurrentFragment();
+                    currentFragment.setArguments(bundle);
+
+                    forecastFragment = new ForecastFragment();
+
+                    bottomNavigationView.setSelectedItemId(R.id.navigation_current);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Weather> call, Throwable t) {
+                Log.i("TESTING", "Error: " + t.toString());
+            }
+        });
+
+
+        /*String json = getJsonFromFile();
         // Use GSON to parse the json string
         Gson gson = new Gson();
-        Weather weather = gson.fromJson(json, Weather.class);
+        Weather weather = gson.fromJson(json, Weather.class);*/
 
-        // Display the Location
-        String[] locationArray = getResources().getStringArray(R.array.provinces);
-        HashMap<String, String> locationHash = getHashFromStringArray(locationArray);
-        String region = weather.getLocation().getRegion();
-        String abbrev = locationHash.get(region);
 
-        TextView textViewLocation = view.findViewById(R.id.textViewLocation);
-        String fullLocation = weather.getLocation().getName() + ", " + abbrev;
-        textViewLocation.setText(fullLocation);
 
         //
         // Setup Bottom Navigation View
         //
-        NavigationBarView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -91,19 +142,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //
-        // Setup Fragments
-        //
 
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("weather", weather);
+    }
 
-        currentFragment = new CurrentFragment();
-        currentFragment.setArguments(bundle);
+    private void DisplayLocation(Location location){
+        // Display the Location
+        String[] locationArray = getResources().getStringArray(R.array.provinces);
+        HashMap<String, String> locationHash = getHashFromStringArray(locationArray);
+        String region = location.getRegion();
+        String abbrev = locationHash.get(region);
 
-        forecastFragment = new ForecastFragment();
-
-        bottomNavigationView.setSelectedItemId(R.id.navigation_current);
+        TextView textViewLocation = view.findViewById(R.id.textViewLocation);
+        String fullLocation = location.getName() + ", " + abbrev;
+        textViewLocation.setText(fullLocation);
     }
 
     // Convert province string array into map<k,v>.
