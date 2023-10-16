@@ -16,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.example.weatherapp700.databinding.ActivityMainBinding;
 import com.example.weatherapp700.fragments.CurrentFragment;
 import com.example.weatherapp700.fragments.ForecastFragment;
+import com.example.weatherapp700.models.ForecastDay;
 import com.example.weatherapp700.models.Location;
 import com.example.weatherapp700.models.Weather;
 import com.example.weatherapp700.retrofit.RetrofitClient;
@@ -80,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
                 //
 
                 if(weather != null){
+
+                    Log.i("TESTING", "Date: " + weather.getForecast().getForecastDays()[0].getDate());
+                    Log.i("TESTING", "Max Temp: " + weather.getForecast().getForecastDays()[0].getDay().getMaxTemp());
+                    Log.i("TESTING", "Hour epoch: " + weather.getForecast().getForecastDays()[0].getHours()[0].getEpoch());
 
                     // Update the location in Activity Layout
                     DisplayLocation(weather.getLocation());
